@@ -990,7 +990,9 @@ axios({
         })
 ```
 
-### url
+### url 
+
+统一资源定位符 网址  用于访问网上的资源。
 
 组成  http: 协议 //hmajax.itheima.net  域名  /api/province 资源路径
 
@@ -1035,5 +1037,147 @@ axios({
             }).then((res) => {
                 console.log(res)
             })
+```
+
+### 常用的请求方法
+
+GET  获取数据
+
+POST  数据提交
+
+PUT  修改数据
+
+DELETE  删除数据
+
+
+
+### HTTP协议
+
+规定了浏览器发送和服务器返回内容的格式 
+
+请求报文  ：**按照协议要求的格式 发送给服务器的内容**
+
+组成：
+
+- 请求行  请求方法 url  协议
+- 请求头  附加信息
+- 请求体  发送的资源
+
+响应报文：服务器返回给浏览器的内容
+
+组成：
+
+- 响应行 协议，HTTP响应状态码 状态信息
+- 响应头 
+- 响应体
+
+
+
+###  form-serialize 插件
+
+```
+//  获取表单元素值   hash 返回js对象   允许为空
+const data =serialize(form,{hash:true,empty:true});
+
+```
+
+
+
+## 聊天的案例
+
+```js
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // 获取机器人回答消息 - 接口地址: http://hmajax.itheima.net/api/robot
+        // 查询参数名: spoken
+        // 查询参数值: 我说的消息
+
+        // 1. 点击发送和敲击回车键，都能发送聊天消息
+        // 2. 把自己和对方消息都展示到页面上
+        // 3. 当聊天消息出现滚动条时，始终让最后一条消息出现在视口范围内
+
+        // 获取元素
+        const input = document.querySelector(".chat_input"); //输入框
+        const sendImg = document.querySelector(".send_img"); //发送按钮
+        const chatList = document.querySelector(".chat_list");  //聊天列表
+        const chatBox = document.querySelector(".chat"); //滚动容器
+
+
+        //封装发送消息的函数
+
+        function sendMsg() {
+            const msg = input.value;
+            if (!msg.trim()) return;
+
+            // 消息展示到右侧
+            renderLi("right", msg);
+
+            // 清空输入框
+            input.value = "";
+
+            //发送请求
+            axios({
+                url: "http://hmajax.itheima.net/api/robot",
+                params: {
+                    spoken: msg
+                }
+            }).then((res) => {
+                console.log(res.data.data.info.text);
+                const robotMsg = res.data.data.info.text;
+
+                //消息展示
+                renderLi("left", robotMsg);
+
+            })
+
+
+
+        }
+
+        // 渲染函数
+        function renderLi(type, msg) {
+            const li = document.createElement("li");
+            li.className = type;
+
+            if (type === "right") {
+                // 我的消息
+                li.innerHTML = `
+            <span>${msg}</span>
+            <img src='./assets/send.png' alt=''>
+            `;
+            } else {
+                // 机器人的消息
+                li.innerHTML = `
+            <img src='./assets/send.png' alt=''>
+            <span>${msg}</span>
+            `;
+            }
+
+            // 消息添加到列表
+            chatList.appendChild(li);
+
+            // 自动滚动到底部
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        }
+
+        // 点击事件
+        sendImg.addEventListener("click", () => {
+            sendMsg();
+        })
+
+        //回车事件
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                sendMsg();
+            }
+        })
+
+
+
+
+
+
+    </script>
 ```
 
